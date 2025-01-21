@@ -1,11 +1,11 @@
 {
-    "nombre": "Elea_Contractil",
-    "path": "/Users/piko/Barraca Post Dropbox/Elea_Contractil",
+    "nombre": "Lovestories_Jamila",
+    "path": "Lovestories_Jamila",
     "plano": {
-        "nombre": "Assets",
-        "path": "/Users/piko/Barraca Post Dropbox/Elea_Contractil/_Assets",
-        "numero": "",
-        "render_path": "/Users/piko/Barraca Post Dropbox/Elea_Contractil/_Assets/renders",
+        "nombre": "070",
+        "path": "Lovestories_Jamila/070",
+        "numero": "070",
+        "render_path": "Lovestories_Jamila/070/renders",
         "area": "Animation"
     }
 }

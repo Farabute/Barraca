@@ -57,38 +57,73 @@ def guardar_proyecto_seleccionado(nombre, plano):
     with open(CONFIG_FILE, "w") as file:
         json.dump(proyecto_actual.to_dict(), file, indent=4)
 
-@app.route('/')
-def index():
-    return render_template("index.html")
+
+
+def obtener_directorio_base():
+    """Obtiene la ruta del directorio base desde config.json."""
+    if os.path.exists(CONFIG_PROGRAMS):
+        with open(CONFIG_PROGRAMS, "r") as file:
+            try:
+                data = json.load(file)
+                return data.get("proyecto", "")  # Retorna la ruta del proyecto si está configurada
+            except json.JSONDecodeError:
+                print(">>> Error: config.json corrupto, usando ruta vacía.")
+    return ""
 
 @app.route('/proyectos')
 def obtener_proyectos():
-    """Devuelve la lista de proyectos con `_Assets`"""
+    """Devuelve la lista de proyectos con `_Assets`, usando la ruta de configuración."""
+    directorio_base = obtener_directorio_base()
     proyectos = []
-    if os.path.exists(DIRECTORIO_BASE) and os.path.isdir(DIRECTORIO_BASE):
-        for carpeta in sorted(os.listdir(DIRECTORIO_BASE)):
-            ruta_proyecto = os.path.join(DIRECTORIO_BASE, carpeta)
+
+    if os.path.exists(directorio_base) and os.path.isdir(directorio_base):
+        for carpeta in sorted(os.listdir(directorio_base)):
+            ruta_proyecto = os.path.join(directorio_base, carpeta)
             if os.path.isdir(ruta_proyecto) and os.path.isdir(os.path.join(ruta_proyecto, "_Assets")):
                 proyectos.append({"nombre": carpeta, "path": ruta_proyecto})
+
+    # Si no hay proyectos, devolver la opción por defecto
+    if not proyectos:
+        proyectos.append({"nombre": "Seleccione un proyecto...", "path": ""})
+
     return jsonify(proyectos)
 
 @app.route('/planos/<proyecto>')
 def obtener_planos(proyecto):
-    """Devuelve la lista de planos disponibles en un proyecto"""
-    path_proyecto = os.path.join(DIRECTORIO_BASE, proyecto)
+    """Devuelve la lista de planos en formato correcto para el frontend."""
+    directorio_base = obtener_directorio_base()
+    path_proyecto = os.path.join(directorio_base, proyecto)
+
+    # Si la ruta del proyecto no existe o no tiene subcarpetas, mostrar solo "Seleccione un proyecto..."
+    if not os.path.exists(path_proyecto) or not os.path.isdir(path_proyecto):
+        return jsonify([{"nombre": "Seleccione un proyecto...", "path": ""}])
+
     planos = [{"nombre": "Assets", "path": os.path.join(path_proyecto, "_Assets")}]  # Incluir Assets primero
 
-    if os.path.exists(path_proyecto) and os.path.isdir(path_proyecto):
-        subcarpetas = [
-            carpeta for carpeta in os.listdir(path_proyecto)
-            if os.path.isdir(os.path.join(path_proyecto, carpeta)) and "_" in carpeta
-        ]
-        subcarpetas = [
-            {"nombre": c, "path": os.path.join(path_proyecto, c)}
-            for c in subcarpetas if len(c.split("_")) > 1 and c.split("_")[1].isdigit()
-        ]
-        subcarpetas.sort(key=lambda x: int(x["nombre"].split("_")[1]))  # Orden numérico
-        planos.extend(subcarpetas)
+    subcarpetas = [
+        carpeta for carpeta in os.listdir(path_proyecto)
+        if os.path.isdir(os.path.join(path_proyecto, carpeta)) and "_" in carpeta
+    ]
+
+    # Filtrar solo los planos numéricos (segunda palabra con números)
+    planos_numericos = []
+    for carpeta in subcarpetas:
+        partes = carpeta.split("_")
+        if len(partes) > 1 and partes[1].isdigit():
+            planos_numericos.append({
+                "nombre": partes[1],  # Mostrar solo el número
+                "path": os.path.join(path_proyecto, carpeta)
+            })
+
+    # Ordenar por número
+    planos_numericos.sort(key=lambda x: int(x["nombre"]))
+
+    # Si no hay planos numéricos, solo mostrar "Seleccione un proyecto..."
+    if not planos_numericos:
+        return jsonify([{"nombre": "Seleccione un proyecto...", "path": ""}])
+
+    # Agregar los planos ordenados
+    planos.extend(planos_numericos)
 
     return jsonify(planos)
 
@@ -105,6 +140,10 @@ def gestionar_proyecto_seleccionado():
     return jsonify(cargar_proyecto_seleccionado())
 
 # ==================== CONFIGURACIÓN DE RUTAS ====================
+
+@app.route('/')
+def index():
+    return render_template("index.html")
 
 @app.route('/config')
 def configuracion():
@@ -205,6 +244,10 @@ def cargar_configuracion_guardada():
                     programas_instanciados.append(programa)
                     print(f">>> Cargado desde JSON: {programa}")
 
+
+
+
+
 # ==================== DEBUG ====================
 
 @app.route('/debug')
@@ -212,6 +255,12 @@ def debug_info():
     """Devuelve la información actual de las instancias de Proyecto y Plano"""
     global proyecto_actual
     return jsonify(proyecto_actual.to_dict()) if proyecto_actual else jsonify({"error": "No hay proyecto cargado"})
+
+@app.route("/debug-programas", methods=["GET"])
+def debug_programas():
+    """Devuelve todas las instancias de programas activas."""
+    global programas_instanciados
+    return jsonify([programa.to_dict() for programa in programas_instanciados])
 
 if __name__ == '__main__':
     cargar_proyecto_seleccionado()

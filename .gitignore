@@ -3,3 +3,4 @@ __pycache__/
 *.sqlite3
 config_proyecto.json  # No queremos que se suba el archivo de configuración local
 .env  # Si usas variables de entorno
+config.json

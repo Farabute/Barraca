@@ -85,12 +85,8 @@ function guardarConfiguracion() {
     })
     .then(response => response.json())
     .then(data => {
-        console.log(">>> Respuesta del servidor:", data);
-        if (data.status === "success") {
-            console.log(">>> Configuración guardada correctamente.");
-        } else {
-            console.error(">>> Error al guardar configuración:", data.message);
-        }
+        console.log(">>> Configuración guardada correctamente.");
+        actualizarProyectos(); // Refresca la lista de proyectos en index.html
     })
     .catch(error => console.error("Error guardando configuración:", error));
 }
