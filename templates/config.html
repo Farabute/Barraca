@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configuración</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/config.css') }}">
+    <script src="{{ url_for('static', filename='js/config.js') }}" defer></script>
+</head>
+<body>
+
+    <h1>Configuración</h1>
+
+    <div class="config-container">
+        <!-- Configuración del directorio de proyectos -->
+        <div class="config-item">
+            <label for="proyecto-path">Proyectos:</label>
+            <input type="text" id="proyecto-path" readonly>
+            <button onclick="seleccionarRuta('proyecto')">Seleccionar Carpeta</button>
+        </div>
+
+        <!-- Configuración de las rutas de programas -->
+        <div id="programas-container"></div>
+    </div>
+
+    <button onclick="window.location.href='/'">Volver al Inicio</button>
+
+</body>
+</html>
