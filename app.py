@@ -1,13 +1,13 @@
 from flask import Flask, jsonify, render_template, request
 import os
 import json
+import platform
+import subprocess
 from tkinter import Tk, filedialog
 from config import DIRECTORIO_BASE
 from models.proyecto import Proyecto
 from models.plano import Plano
-import platform
-import subprocess
-
+from models.programa import Programa
 
 app = Flask(__name__, static_folder="static")
 
@@ -17,6 +17,8 @@ CONFIG_PROGRAMS = "config.json"  # Rutas de programas
 
 # Instancia Global del Proyecto Actual
 proyecto_actual = None
+programas_instanciados = []  # Lista global para almacenar instancias de programas
+
 
 # ==================== PROYECTOS Y PLANOS ====================
 
@@ -147,14 +149,28 @@ def seleccionar_ruta_api():
 
 @app.route("/guardar-configuracion", methods=["POST"])
 def guardar_configuracion():
-    """Guarda la configuración en config.json"""
+    """Guarda la configuración en config.json y crea instancias de programas"""
+    global programas_instanciados
     data = request.json
-    print(">>> Guardando configuración:", data)  # DEBUG: Ver qué llega desde el frontend
+
+    print(">>> Guardando configuración en config.json:", data)  # Debug
 
     try:
+        # Guardar en config.json primero
         with open(CONFIG_PROGRAMS, "w") as file:
             json.dump(data, file, indent=4)
-        print(">>> Configuración guardada correctamente")
+        
+        print(">>> Configuración guardada correctamente en config.json")
+
+        # Crear instancias de Programa solo después de guardar correctamente
+        programas_instanciados = []
+        if "programas" in data:
+            for nombre, ruta in data["programas"].items():
+                if ruta:  # Solo si tiene una ruta válida
+                    programa = Programa(nombre, ruta)
+                    programas_instanciados.append(programa)
+                    print(f">>> Instanciado: {programa}")
+
         return jsonify({"status": "success"})
     except Exception as e:
         print(">>> Error guardando configuración:", str(e))
@@ -162,11 +178,32 @@ def guardar_configuracion():
 
 @app.route("/cargar-configuracion", methods=["GET"])
 def cargar_configuracion():
-    """Carga la configuración de programas desde config.json"""
+    """Devuelve la configuración guardada en config.json para el frontend."""
     if os.path.exists(CONFIG_PROGRAMS):
         with open(CONFIG_PROGRAMS, "r") as file:
-            return jsonify(json.load(file))
-    return jsonify({})
+            try:
+                data = json.load(file)
+                print(">>> Enviando configuración al frontend:", data)  # Debug
+                return jsonify(data)
+            except json.JSONDecodeError:
+                print(">>> Error: config.json está corrupto. Creando uno nuevo.")
+                with open(CONFIG_PROGRAMS, "w") as file:
+                    json.dump({"proyecto": "", "programas": {}}, file, indent=4)
+    return jsonify({"proyecto": "", "programas": {}})
+
+def cargar_configuracion_guardada():
+    """Carga la configuración de programas guardados y los instancia"""
+    global programas_instanciados
+
+    if os.path.exists(CONFIG_PROGRAMS):
+        with open(CONFIG_PROGRAMS, "r") as file:
+            data = json.load(file)
+            programas_instanciados = []
+            for nombre, ruta in data.get("programas", {}).items():
+                if ruta:
+                    programa = Programa(nombre, ruta)
+                    programas_instanciados.append(programa)
+                    print(f">>> Cargado desde JSON: {programa}")
 
 # ==================== DEBUG ====================
 
@@ -178,4 +215,5 @@ def debug_info():
 
 if __name__ == '__main__':
     cargar_proyecto_seleccionado()
+    cargar_configuracion_guardada()  # Cargar programas guardados
     app.run(debug=True)

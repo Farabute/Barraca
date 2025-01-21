@@ -17,6 +17,8 @@ const PROGRAM_ORDER = [
 // Función para cargar los inputs dinámicos de los programas
 function generarInputs() {
     const container = document.getElementById("programas-container");
+    container.innerHTML = ""; // Asegura que no se dupliquen elementos
+
     PROGRAM_ORDER.forEach(programa => {
         const div = document.createElement("div");
         div.classList.add("config-item");
@@ -38,6 +40,8 @@ function generarInputs() {
         div.appendChild(button);
         container.appendChild(div);
     });
+
+    cargarConfiguracion(); // Cargar configuración después de generar los inputs
 }
 
 function seleccionarRuta(tipo) {
@@ -72,7 +76,7 @@ function guardarConfiguracion() {
 
     const configData = { proyecto: proyectoPath, programas: programas };
 
-    console.log(">>> Enviando configuración al servidor:", configData);  // DEBUG
+    console.log(">>> Enviando configuración al servidor:", configData);  // Debug
 
     fetch("/guardar-configuracion", {
         method: "POST",
@@ -80,9 +84,39 @@ function guardarConfiguracion() {
         body: JSON.stringify(configData)
     })
     .then(response => response.json())
-    .then(data => console.log(">>> Respuesta del servidor:", data))
+    .then(data => {
+        console.log(">>> Respuesta del servidor:", data);
+        if (data.status === "success") {
+            console.log(">>> Configuración guardada correctamente.");
+        } else {
+            console.error(">>> Error al guardar configuración:", data.message);
+        }
+    })
     .catch(error => console.error("Error guardando configuración:", error));
 }
 
-// Cargar los inputs dinámicos al inicio
+// Cargar configuración desde Flask
+function cargarConfiguracion() {
+    fetch("/cargar-configuracion")
+        .then(response => response.json())
+        .then(data => {
+            console.log(">>> Configuración cargada desde el servidor:", data);
+
+            if (data.proyecto) {
+                document.getElementById("proyecto-path").value = data.proyecto;
+            }
+
+            if (data.programas) {
+                PROGRAM_ORDER.forEach(programa => {
+                    const inputId = `ruta-${programa.replace(/\s+/g, '-').toLowerCase()}`;
+                    if (data.programas[programa]) {
+                        document.getElementById(inputId).value = data.programas[programa];
+                    }
+                });
+            }
+        })
+        .catch(error => console.error("Error cargando configuración:", error));
+}
+
+// Al cargar la página, generamos los inputs y luego cargamos la configuración guardada
 document.addEventListener("DOMContentLoaded", generarInputs);

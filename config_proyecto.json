@@ -1,11 +1,11 @@
 {
-    "nombre": "Huinca_Sedal_Storms",
-    "path": "/Users/piko/Barraca Post Dropbox/Huinca_Sedal_Storms",
+    "nombre": "Elea_Contractil",
+    "path": "/Users/piko/Barraca Post Dropbox/Elea_Contractil",
     "plano": {
-        "nombre": "hs_390",
-        "path": "/Users/piko/Barraca Post Dropbox/Huinca_Sedal_Storms/hs_390",
+        "nombre": "Assets",
+        "path": "/Users/piko/Barraca Post Dropbox/Elea_Contractil/_Assets",
         "numero": "",
-        "render_path": "/Users/piko/Barraca Post Dropbox/Huinca_Sedal_Storms/hs_390/renders",
+        "render_path": "/Users/piko/Barraca Post Dropbox/Elea_Contractil/_Assets/renders",
         "area": "Animation"
     }
 }

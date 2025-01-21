@@ -1,28 +1,79 @@
+/* Fuente y estructura similar a config.html */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap');
+
 body {
-    font-family: Arial, sans-serif;
-    text-align: center;
-    margin: 20px;
+    font-family: 'Montserrat', sans-serif;
     background-color: #f4f4f4;
-}
-
-h1 {
     color: #333;
-}
-
-label {
-    font-weight: bold;
-}
-
-select {
-    width: 250px;
-    padding: 8px;
-    margin: 10px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
 }
 
 .container {
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 60%;  /* Igual que en config.html */
+    text-align: center;
+}
+
+h1 {
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 20px;
+}
+
+.form-section {
     display: flex;
-    flex-direction: column;
     align-items: center;
+    justify-content: space-between;
+    margin-bottom: 15px;
+}
+
+label {
+    flex: 1;
+    text-align: left;
+    font-weight: 600;
+    margin-right: 10px; /* Reduce la separación entre label y input */
+}
+
+select {
+    flex: 2;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+    width: 60%; /* Mismo tamaño que los inputs de config.html */
+    margin-right: 15px; /* Aumenta la separación entre el input y el botón */
+}
+
+button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.3s;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+/* Botón de configuración */
+.config-button {
+    background-color: #007BFF;
+    margin-top: 20px;
+    padding: 10px 15px;
+}
+
+.config-button:hover {
+    background-color: #0056b3;
 }

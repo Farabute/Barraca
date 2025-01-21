@@ -3,20 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestión de Proyectos</title>
-    <link rel="stylesheet" href="/static/css/index.css">
-    <script src="/static/js/index.js" defer></script>
+    <title>Barraca Pipe</title>
+    <link rel="icon" href="{{ url_for('static', filename='icons/iso-stroke.png') }}" type="image/png">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/index.css') }}">
+    <script src="{{ url_for('static', filename='js/index.js') }}" defer></script>
 </head>
 <body>
-    <h1>Gestión de Proyectos</h1>
 
     <div class="container">
-        <label for="proyecto-select">Proyectos:</label>
-        <select id="proyecto-select"></select>
+        <h1>Inicio</h1>
 
-        <label for="plano-select">Planos:</label>
-        <select id="plano-select"></select>
+        <div class="form-section">
+            <label for="proyecto-select">📂 Selecciona un Proyecto:</label>
+            <select id="proyecto-select">
+                <option>Seleccione un proyecto...</option>
+            </select>
+            <button onclick="actualizarProyectos()">Actualizar</button>
+        </div>
+
+        <div class="form-section">
+            <label for="plano-select">📄 Selecciona un Plano:</label>
+            <select id="plano-select">
+                <option>Seleccione un proyecto primero...</option>
+            </select>
+        </div>
+
+        <div class="buttons">
+            <button class="config-button" onclick="window.location.href='/config'">Ir a Configuración</button>
+        </div>
     </div>
-    <button id="btn-config" onclick="window.location.href='/config'">Configuración</button>
+
 </body>
 </html>
