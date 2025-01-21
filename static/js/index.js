@@ -33,7 +33,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
                     if (proyectoGuardado) {
                         selectProyecto.value = proyectoGuardado;
-                        cargarPlanos(proyectoGuardado, proyectoSeleccionado.plano);
+                        cargarPlanos(proyectoGuardado, proyectoSeleccionado.plano.nombre);
                     }
                 });
         });
@@ -57,21 +57,16 @@ document.addEventListener("DOMContentLoaded", function() {
             .then(response => response.json())
             .then(planos => {
                 limpiarComboPlanos();
-
-                let optionAssets = document.createElement("option");
-                optionAssets.textContent = "Assets";
-                optionAssets.value = "Assets";
-                selectPlano.appendChild(optionAssets);
-                selectPlano.value = "Assets";  
-
+    
                 planos.forEach(plano => {
                     let option = document.createElement("option");
-                    option.textContent = plano.replace(/^[a-zA-Z]+_/, ""); 
-                    option.value = plano;
+                    option.textContent = plano.nombre.replace(/^[a-zA-Z]+_/, ""); 
+                    option.value = plano.nombre;
                     selectPlano.appendChild(option);
                 });
-
-                if (planoSeleccionado && selectPlano.querySelector(`option[value="${planoSeleccionado}"]`)) {
+    
+                // Si hay un plano guardado, seleccionarlo en el combo
+                if (planoSeleccionado) {
                     selectPlano.value = planoSeleccionado;
                 }
             });
@@ -81,20 +76,17 @@ document.addEventListener("DOMContentLoaded", function() {
         let planoSeleccionado = this.value;
         let proyectoSeleccionado = document.getElementById("proyecto-select").value;
     
+        console.log(">>> Plano Seleccionado:", planoSeleccionado);  // Debug en consola
+    
         if (planoSeleccionado && proyectoSeleccionado) {
-            fetch('/seleccionar_plano', {
+            fetch('/proyecto_seleccionado', {  // Asegurar que se usa la ruta correcta
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ plano: planoSeleccionado })
+                body: JSON.stringify({ nombre: proyectoSeleccionado, plano: planoSeleccionado })
             })
             .then(response => response.json())
-            .then(data => {
-                if (data.status === "success") {
-                    console.log("Plano guardado:", data.plano, "Ruta:", data.plano_path);
-                } else {
-                    console.error("Error al guardar el plano.");
-                }
-            });
+            .then(data => console.log(">>> Respuesta del servidor:", data))
+            .catch(error => console.error("Error al guardar el plano:", error));
         }
     });
 });

@@ -1,8 +1,13 @@
 from enum import Enum
 
 class Area(Enum):
-    """Enum para definir las áreas de los planos."""
-    THREE_D = "3D"
-    COMP = "Comp"
+    ANIMATION = "Animation"
+    CHARACTERS = "Characters"
+    FX = "FX"
+    LAYOUT = "Layout"
+    LIGHTING = "Lighting"
+    SET = "Set"
+    SIMULATION = "Simulation"
+    LOOKDEV = "LookDev"
     TRACK = "Track"
-    ART = "Art"
+    COMP = "Comp"

@@ -1,52 +1,52 @@
 import os
 from models.plano import Plano
+from models.area import Area
 
 class Proyecto:
     def __init__(self, nombre, path):
         self.nombre = nombre
         self.path = path
-        self.iniciales = self.obtener_iniciales(nombre)
-        self.plano_seleccionado = None  # Inicialmente sin plano seleccionado
+        self.plano = None  # Instancia de Plano
 
-    def __repr__(self):
-        return f"Proyecto(nombre={self.nombre}, path={self.path})"
+    def set_plano(self, nombre_plano):
+        """Asigna un plano al proyecto y genera su ruta"""
+        plano_path = os.path.join(self.path, nombre_plano) if nombre_plano != "Assets" else os.path.join(self.path, "_Assets")
+        render_path = os.path.join(plano_path, "renders")
+        area = self.determinar_area(nombre_plano)
+        numero = nombre_plano if nombre_plano.isdigit() else ""
 
-    def obtener_iniciales(self, nombre):
-        """Obtiene las iniciales de las dos primeras palabras del nombre."""
-        palabras = nombre.split("_")
-        if len(palabras) >= 2:
-            return palabras[0][0] + palabras[1][0]
-        return nombre[:2]  # Si hay menos de dos palabras, usa los primeros dos caracteres
+        self.plano = Plano(nombre_plano, plano_path, numero, render_path, area)
+
+    def determinar_area(self, nombre_plano):
+        """Determina el área del plano basado en su nombre"""
+        if "comp" in nombre_plano.lower():
+            return Area.COMP
+        elif "track" in nombre_plano.lower():
+            return Area.TRACK
+        elif "3d" in nombre_plano.lower():
+            return Area.LOOKDEV
+        elif "art" in nombre_plano.lower():
+            return Area.LOOKDEV
+        return Area.ANIMATION  # Valor por defecto
 
     def listar_planos(self):
-        """Lista los planos del proyecto, agregando 'Assets' primero y luego los planos en orden numérico."""
-        planos = []
+        """Lista los planos del proyecto"""
+        planos = ["Assets"]
         if os.path.exists(self.path) and os.path.isdir(self.path):
             subcarpetas = [
                 carpeta for carpeta in os.listdir(self.path)
-                if os.path.isdir(os.path.join(self.path, carpeta)) and carpeta.startswith(self.iniciales)
+                if os.path.isdir(os.path.join(self.path, carpeta)) and "_" in carpeta
             ]
-            # Ordenar los planos numéricamente (si contienen números)
-            subcarpetas.sort(key=lambda x: int(''.join(filter(str.isdigit, x))) if any(c.isdigit() for c in x) else float('inf'))
-            planos.append("Assets")
+            # Filtrar solo los planos numéricos (segunda palabra con números)
+            subcarpetas = [c for c in subcarpetas if len(c.split("_")) > 1 and c.split("_")[1].isdigit()]
+            subcarpetas.sort(key=lambda x: int(x.split("_")[1]))  # Orden numérico
             planos.extend(subcarpetas)
         return planos
 
-    def seleccionar_plano(self, nombre_plano):
-        """Selecciona un plano basado en el nombre."""
-        if nombre_plano == "Assets":
-            path_plano = os.path.join(self.path, "_Assets")
-            render_path = os.path.join(path_plano, "renders")
-            self.plano_seleccionado = Plano(nombre_plano, path_plano, "", render_path, "Comp")
-        else:
-            path_plano = os.path.join(self.path, nombre_plano)
-            render_path = os.path.join(path_plano, "renders")
-            self.plano_seleccionado = Plano(nombre_plano, path_plano, nombre_plano.split("_")[-1], render_path, "3D")
-
     def to_dict(self):
+        """Devuelve la información del proyecto en formato JSON"""
         return {
             "nombre": self.nombre,
             "path": self.path,
-            "iniciales": self.iniciales,
-            "plano_seleccionado": self.plano_seleccionado.to_dict() if self.plano_seleccionado else None
+            "plano": self.plano.to_dict() if self.plano else None
         }
