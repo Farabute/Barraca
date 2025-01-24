@@ -1,11 +1,11 @@
 {
-    "nombre": "Lovestories_Jamila",
-    "path": "Lovestories_Jamila",
+    "nombre": "Hogarth_Coke_Studio",
+    "path": "Hogarth_Coke_Studio",
     "plano": {
-        "nombre": "070",
-        "path": "Lovestories_Jamila/070",
-        "numero": "070",
-        "render_path": "Lovestories_Jamila/070/renders",
+        "nombre": "290",
+        "path": "Hogarth_Coke_Studio/290",
+        "numero": "290",
+        "render_path": "Hogarth_Coke_Studio/290/renders",
         "area": "Animation"
     }
 }

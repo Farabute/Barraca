@@ -1,6 +1,8 @@
 document.addEventListener("DOMContentLoaded", function() {
     let selectProyecto = document.getElementById("proyecto-select");
     let selectPlano = document.getElementById("plano-select");
+    let programasContainer = document.getElementById("programas-container");
+
 
     function limpiarCombos() {
         selectProyecto.innerHTML = "<option>Seleccione un proyecto...</option>";
@@ -107,5 +109,56 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
 
+
+    function cargarProgramas() {
+        fetch('/programas')
+            .then(response => response.json())
+            .then(programas => {
+                programasContainer.innerHTML = "";
+                programas.forEach(programa => {
+                    let boton = document.createElement("button");
+                    let img = document.createElement("img");
+
+                    // Convertir el nombre del programa en formato compatible con el archivo de icono
+                    let iconoNombre = programa.nombre.toLowerCase().replace(/ /g, "_") + ".png";
+
+                    img.src = `static/icons/${iconoNombre}`;
+                    img.alt = programa.nombre;
+                    img.classList.add("icono-programa");
+
+                    boton.appendChild(img);
+                    boton.classList.add("programa-button");
+                    boton.setAttribute("title", programa.nombre); // Tooltip con el nombre del programa
+
+                    boton.addEventListener("click", function() {
+                        abrirPrograma(programa.nombre);
+                    });
+
+                    programasContainer.appendChild(boton);
+                });
+            })
+            .catch(error => console.error("Error cargando programas:", error));
+    }
+
+    function abrirPrograma(nombrePrograma) {
+        let proyecto = document.getElementById("proyecto-select").value;
+        let plano = document.getElementById("plano-select").value;
+
+        if (!proyecto || !plano) {
+            alert("Selecciona un proyecto y un plano antes de abrir un programa.");
+            return;
+        }
+
+        fetch('/abrir-programa', {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ proyecto, plano, programa: nombrePrograma })
+        }).then(response => response.json())
+          .then(data => console.log("Programa abierto:", data))
+          .catch(error => console.error("Error al abrir programa:", error));
+    }
+
     cargarProyectos();  // Cargar proyectos al inicio
+    cargarProgramas();
+
 });

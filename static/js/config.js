@@ -15,6 +15,7 @@ const PROGRAM_ORDER = [
 ];
 
 // Función para cargar los inputs dinámicos de los programas
+// Función para generar inputs de programas con botones de borrar
 function generarInputs() {
     const container = document.getElementById("programas-container");
     container.innerHTML = ""; // Asegura que no se dupliquen elementos
@@ -31,13 +32,18 @@ function generarInputs() {
         input.id = `ruta-${programa.replace(/\s+/g, '-').toLowerCase()}`;
         input.readOnly = true;
 
-        const button = document.createElement("button");
-        button.textContent = "Seleccionar Archivo";
-        button.onclick = () => seleccionarRuta(programa);
+        const buttonSeleccionar = document.createElement("button");
+        buttonSeleccionar.textContent = "Seleccionar";
+        buttonSeleccionar.onclick = () => seleccionarRuta(programa);
+
+        const buttonBorrar = document.createElement("button");
+        buttonBorrar.textContent = "Borrar";
+        buttonBorrar.classList.add("delete-button");
 
         div.appendChild(label);
         div.appendChild(input);
-        div.appendChild(button);
+        div.appendChild(buttonSeleccionar);
+        div.appendChild(buttonBorrar);
         container.appendChild(div);
     });
 

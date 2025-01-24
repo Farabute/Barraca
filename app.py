@@ -246,6 +246,54 @@ def cargar_configuracion_guardada():
 
 
 
+# ==================== PROGRAMAS ====================
+
+def obtener_programas():
+    """Carga los programas desde las instancias activas o desde config.json si no hay instancias."""
+    global programas_instanciados
+
+    if programas_instanciados:
+        return programas_instanciados  # Retorna la lista de objetos directamente
+
+    if not os.path.exists(CONFIG_FILE):
+        return []
+
+    with open(CONFIG_FILE, "r") as file:
+        data = json.load(file)
+
+    # Convertir los datos del JSON en instancias de `Programa`
+    programas_instanciados = [Programa(nombre, ruta) for nombre, ruta in data.get("programas", {}).items()]
+
+    return programas_instanciados
+
+@app.route('/programas')
+def obtener_lista_programas():
+    """Devuelve la lista de programas configurados."""
+    programas = obtener_programas()
+    
+    # Convertimos los objetos de la clase `Programa` en diccionarios antes de enviarlos
+    programas_json = [{"nombre": p.nombre, "ruta": p.ruta} for p in programas]
+
+    print(f"DEBUG - Programas enviados al frontend: {programas_json}")  # Para ver en consola lo que se envía
+    return jsonify(programas_json)
+
+
+@app.route('/abrir-programa', methods=["POST"])
+def abrir_programa():
+    """Abre el programa seleccionado con el proyecto y plano"""
+    data = request.json
+    programas = obtener_programas()
+    
+    # Buscar el programa con el nombre recibido en la solicitud
+    programa = next((p for p in programas if p.nombre == data["programa"]), None)
+
+    if programa and os.path.exists(programa.ruta):
+        subprocess.Popen([programa.ruta])
+        return jsonify({"status": "ok", "programa": programa.nombre})
+    else:
+        return jsonify({"status": "error", "message": "Programa no encontrado"}), 404
+
+
 
 
 # ==================== DEBUG ====================
@@ -265,4 +313,5 @@ def debug_programas():
 if __name__ == '__main__':
     cargar_proyecto_seleccionado()
     cargar_configuracion_guardada()  # Cargar programas guardados
+    programas_instanciados = obtener_programas()  # Cargar programas al inicio
     app.run(debug=True)

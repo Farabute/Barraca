@@ -18,7 +18,7 @@ body {
     padding: 30px;
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    width: 60%;  /* Igual que en config.html */
+    width: 60%;
     text-align: center;
 }
 
@@ -39,7 +39,7 @@ label {
     flex: 1;
     text-align: left;
     font-weight: 600;
-    margin-right: 10px; /* Reduce la separación entre label y input */
+    margin-right: 10px;
 }
 
 select {
@@ -48,8 +48,8 @@ select {
     border: 1px solid #ccc;
     border-radius: 5px;
     font-size: 16px;
-    width: 60%; /* Mismo tamaño que los inputs de config.html */
-    margin-right: 15px; /* Aumenta la separación entre el input y el botón */
+    width: 60%;
+    margin-right: 15px;
 }
 
 button {
@@ -63,8 +63,57 @@ button {
     transition: background 0.3s;
 }
 
-button:hover {
-    background-color: #45a049;
+/* Contenedor de botones centrado */
+.programas-grid {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 20px;
+}
+
+/* Botones de programas (sin borde) */
+.programa-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 10px;
+    position: relative;
+}
+
+/* Iconos de programas (50% más grandes) */
+.programa-button img {
+    width: 75px; /* Antes 50px */
+    height: 75px; /* Antes 50px */
+    transition: transform 0.2s;
+}
+
+/* Animación al pasar el mouse */
+.programa-button:hover img {
+    transform: scale(1.1);
+}
+
+/* Tooltips con el nombre del programa */
+.programa-button::after {
+    content: attr(title);
+    position: absolute;
+    bottom: -15px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.75);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 12px;
+    white-space: nowrap;
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.programa-button:hover::after {
+    visibility: visible;
+    opacity: 1;
 }
 
 /* Botón de configuración */
